@@ -1,0 +1,42 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+// this is not necessary, just for testing (OpenCV Points should be used instead)
+struct Point
+{
+    int x;
+    int y;
+
+
+    Point():
+    x(0), y(0){}
+    Point(int xVal, int yVal):
+    x(xVal), y(yVal){}
+};
+
+int main()
+{
+    std::vector<Point> cnt = {
+        {1,2},{4,5},{1,6}, {7,8}, {9,3}, {2,6}
+    };
+
+    // compare x axis
+    auto val = std::minmax_element(cnt.begin(), cnt.end(), [](Point const& a, Point const& b){
+        return a.x < b.x;
+    });
+
+    std::cout << " leftMost [ " << val.first->x << ", " << val.first->y << " ]" << std::endl;
+    std::cout << " RightMost [ " << val.second->x << ", " << val.second->y << " ]" << std::endl;
+
+    // compare y axis
+    val = std::minmax_element(cnt.begin(), cnt.end(), [](Point const& a, Point const& b){
+        return a.y < b.y;
+    });
+
+    std::cout << " TopMost [ " << val.first->x << ", " << val.first->y << " ]" << std::endl;
+    std::cout << " BottomMost [ " << val.second->x << ", " << val.second->y << " ]" << std::endl;
+
+
+    return 0;
+}

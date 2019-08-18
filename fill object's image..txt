@@ -1,0 +1,126 @@
+#include "opencv2/imgproc/imgproc.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include <stdlib.h>
+#include <stdio.h>
+#include <iostream>
+using namespace cv;
+using namespace std;
+
+
+
+Mat src, src_gray;
+Mat dst, detected_edges;
+
+int edgeThresh = 1;
+int lowThreshold;
+int const max_lowThreshold = 100;
+int ratio = 3;
+int kernel_size = 3;
+//char* window_name = "Edge Map";
+
+
+
+void CannyThreshold(int, void*)
+{
+	blur(src_gray, detected_edges, Size(3, 3));
+
+	Canny(detected_edges, detected_edges, lowThreshold, lowThreshold*ratio, kernel_size);
+
+	dst = Scalar::all(0);
+
+	src.copyTo(dst, detected_edges);
+	
+	imshow("pencere", dst);
+}
+
+
+
+int main(int argc, char** argv)
+{
+
+	VideoCapture video(0);    //kamerayý baþlatýlýyor.
+	
+	if (!video.isOpened())   //açýlmamýþsa söyler.
+	{
+		cout << "kamera baslatýilamadi" << endl;
+		return -1;
+	}
+	
+	while (true)
+	{
+		video.read(src);   //src ye kamera görüntüsünü atýyor;
+
+		dst.create(src.size(), src.type());
+
+		cvtColor(src, src_gray, CV_BGR2GRAY);  //görüntü gri formata dönüþtürüldü.
+
+		namedWindow("pencere", CV_WINDOW_AUTOSIZE);    //görüntü penceresi oluþturuldu.
+
+		createTrackbar("Min Threshold:", "pencere", &lowThreshold, max_lowThreshold, CannyThreshold); //threshold ayarýnýn yapabilmek için
+		                                                                           //trackbar oluþturuluyor.
+		CannyThreshold(0, 0);
+		//----------------------------   Tamamlamak için		
+		Mat im_th;
+		
+		Mat im_floodfill = dst.clone();
+		floodFill(im_floodfill, cv::Point(0, 0), Scalar(255));
+
+		// Invert floodfilled image
+		Mat im_floodfill_inv;
+		bitwise_not(im_floodfill, im_floodfill_inv);
+
+		// Combine the two images to get the foreground.
+		Mat im_out = (dst | im_floodfill_inv);
+		//---------------------- Sonu
+
+		Mat yeni1;
+		inRange(im_out, Scalar(255, 255, 255), Scalar(255, 255, 255), yeni1); //Tamamlanmýþ görüntü beyaz ve sarý oluyor moment iþlemini 
+                                                                              //yapabilmek içinn görüntü siyah beyaza çevirilir.
+		//imshow("pencereee", yeni1);
+
+		Moments buyukluk = moments(yeni1); //moment iþlemi görüntüdeki beyaz yerlerin konumunu elde ettirir.
+		
+		int alan=buyukluk.m00;   // m00 beyaz bölgenin alanýný elde ettirir.
+		
+		
+
+		Mat cizgiresim = Mat::zeros(yeni1.size(), CV_8UC3); // beyaz bölge algýlanmadýgýnda siyah ekran olsun diye siyahlaþtýrýlmýþ görüntü. 
+
+		if (alan>75000)    //alaný 75000 den küçük olursa beyaz bölgenin gösterim çalýþmaz.
+		{
+			imshow("pencere3", yeni1);
+		}
+
+
+		if (alan<75000)     //alan 75000 den küçük oldugunda siyahlýk göstermesi için.
+		{
+			imshow("pencere3", cizgiresim);
+		}
+		
+		//imshow("pencere2", im_floodfill_inv);
+		//-----------------------------
+
+		
+
+		//threshold(im_out, im_out, 0, 255, THRESH_BINARY_INV);
+		
+		
+
+		/*imshow("Thresholded Image", im_th);
+		imshow("Floodfilled Image", im_floodfill);
+		imshow("Inverted Floodfilled Image", im_floodfill_inv);
+		imshow("Foreground", im_out);*/
+		
+
+		if (waitKey(30) == 27)   // esc tuþunun ASCII karþýlýgý 27  esc ye basýldýgýnda çýkýþ yapýlmasý için.
+		{
+			cout << "cikis yaptiniz" << endl;
+			break;
+		}
+
+	}
+
+	
+
+	return 0;
+}

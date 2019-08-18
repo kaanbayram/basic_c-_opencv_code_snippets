@@ -1,0 +1,5 @@
+1. Bilgisayar -> özellikler -> Sol taraf geliþmiþ sistem ayarlarý ->ortam deðiþkenleri -> sistem deðiþkenleri -> Path -> Düzenle ->  opencv\build\x64\vc14\bin uzantýsýný ekle
+2. Boþ proje oluþtur, kaynak dosyasý oluþtur. x86 da iken ayarlardan c++ genel aditional include directories adresine build\include adresini yapýþtýr.
+3. linker in additional library directoriesine vc14\lib adresini kopyala.
+4. Input da additional dependencies e opencv_world330d.lib  yada hangi sürümse ismi kopyala.
+5. Yukarýdan x86 yý x64 yap.

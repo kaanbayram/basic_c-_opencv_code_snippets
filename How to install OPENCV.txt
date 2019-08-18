@@ -1,0 +1,7 @@
+1. Computer-> properties-> Advanced System Settings. -> Environment Variables -> system variables -> Path -> edit ->  ADD opencv\build\x64\vc14\bin 
+2. create empty c++ project --> create source folder --> Paste build\include adress to c++ general aditional include directories address when project in case of x86.
+3. linker in additional library directorie copy vc14\lib adress.
+4. Copy opencv_world330d.lib or whatever your version to additional dependencies in Input.
+5. Make x86 to x64 on upside.
+
+
